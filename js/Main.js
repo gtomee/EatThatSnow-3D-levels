@@ -1,13 +1,11 @@
 var renderer;
 var camera;
 var scene;
-
-// objects
-var cube;
-
+var controls;
 
 var paused;
 
+var bounds = {x:0, y:0};
 
 window.onload = function() {
 	init();
@@ -36,6 +34,8 @@ function init() {
 		10000);
 	camera.position.z = 300;
 	
+	controls = new THREE.TrackballControls(camera);
+	
 	// init scene
 	scene = new THREE.Scene();
 	
@@ -49,33 +49,46 @@ function init() {
 		map: THREE.ImageUtils.loadTexture("data/img/bottom.png")
 	});
 	
-	var middleBottomMat = new THREE.MeshLambertMaterial({
+	var upDownMat = new THREE.MeshLambertMaterial({
 		map: THREE.ImageUtils.loadTexture("data/img/up_down.png")
 	});
 	
-	var materials = [
-		middleBottomMat,
-		middleBottomMat,
+	var middleMat = new THREE.MeshLambertMaterial({
+		map: THREE.ImageUtils.loadTexture("data/img/middle.png")
+	});
+	
+	var upMiddleMat = new THREE.MeshLambertMaterial({
+		map: THREE.ImageUtils.loadTexture("data/img/up_middle.png")
+	});
+	
+	var materials; // final materials
+	
+	var matUpDown = [
+		upDownMat,
+		upDownMat,
 		topMat,
 		bottomMat,
-		middleBottomMat,
-		middleBottomMat
+		upDownMat,
+		upDownMat
 	];
 	
+	var matMiddle = [
+		middleMat,
+		middleMat,
+		middleMat,
+		middleMat,
+		middleMat,
+		middleMat
+	];
 	
-	for (var i = 0; i < 10; ++i) {
-		// init cube and add it to the scene
-		cube = new THREE.Mesh(
-			new THREE.CubeGeometry(50,50,50,3,3,3, materials),
-			new THREE.MeshFaceMaterial()
-			//new THREE.MeshBasicMaterial({color: 0x00FF00, opacity: 1})
-		);
-		cube.position.x = i*50;
-		cube.castShadow = true;
-		cube.receiveShadow = true;
-		
-		scene.add(cube);
-	}
+	var matUpMiddle = [
+		upMiddleMat,
+		upMiddleMat,
+		topMat,
+		bottomMat,
+		upMiddleMat,
+		upMiddleMat
+	];
 	
 	// init light
 	var light = new THREE.AmbientLight(0x999999);
@@ -88,10 +101,82 @@ function init() {
 	// enable shadows for a light
 	light.castShadow = true;
 	
+	// load level
+	$.ajax({
+		dataType: 'text',
+		success: function(string) {
+			var file = $.parseJSON(string);
+			var tiles = file.data;
+			
+			var width = file.width;
+			var height = file.height;
+			
+			
+			var j = height-1;
+			for (var i = 0; i < tiles.length; ++i) {
+				
+				var k = i%width;
+				if (k == 0) {
+					j--;
+				}
+				
+				if (tiles[i] >= 9) {
+					
+					switch (tiles[i]) {
+					
+						case 9:
+							materials = matUpMiddle;
+						break;
+						case 10:
+							materials = matMiddle;
+						break;
+						case 11:
+							materials = matUpDown;
+						break;
+						case 12:
+							materials = matUpDown;
+						break;
+					}
+					
+					cube = new THREE.Mesh(
+						new THREE.CubeGeometry(50,50,50,3,3,3, materials),
+						new THREE.MeshFaceMaterial()
+					);
+					cube.position.x = k*50;
+					cube.position.y = j*50;
+					cube.castShadow = true;
+					cube.receiveShadow = true;
+					
+					scene.add(cube);
+					
+					if (cube.position.x > bounds.x) {
+						bounds.x = cube.position.x;
+					}
+					
+					if (cube.position.y > bounds.y) {
+						bounds.y = cube.position.y;
+					}
+				}
+				
+			}
+			
+			scene.position.x = scene.position.x+bounds.x/2;
+			camera.position.set(bounds.x/2, bounds.y, 1900);
+			camera.lookAt(scene.position.x +bounds.x/2, scene.position.y + bounds.y);
+			console.log(scene.position.x +bounds.x/2);
+		},
+		url: 'data/levels/4.json'
+	});
+		
+	
+	
 	renderer.render(scene, camera);
 	paused = false;
 	
+	window.addEventListener('resize', onWindowResize, false );
+	
 }
+
 
 
 function update() {
@@ -99,13 +184,26 @@ function update() {
 	
 }
 
+function onWindowResize() {
+
+	camera.aspect = window.innerWidth / window.innerHeight;
+	camera.updateProjectionMatrix();
+
+	renderer.setSize(window.innerWidth, window.innerHeight);
+
+}
+
+
 function render(t) {
 	if (!paused) {
-	  camera.position.set(
-		Math.sin(t/1000)*900, 550, Math.cos(t/1000)*300);
+	  //camera.position.set(Math.sin(t/1000)*1900 + bounds.x/2, bounds.y, 900);
 	  renderer.clear();
-	  camera.lookAt(scene.position);
+	  //camera.lookAt(scene.position.x +bounds.x/2, scene.position.y + bounds.y);
+	  //camera.lookAt(scene.position);
 	  renderer.render(scene, camera);
 	}
+	
+	controls.update();
+	
 	window.requestAnimFrame(render, renderer.domElement);
 };
