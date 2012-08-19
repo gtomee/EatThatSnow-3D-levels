@@ -36,11 +36,18 @@ function init() {
 	// init scene
 	scene = new THREE.Scene();
 	
+	
+	// loading materials
+	var material = new THREE.MeshLambertMaterial({
+		map: THREE.ImageUtils.loadTexture("data/img/middle.png")
+	});
+	
 	for (var i = 0; i < 10; ++i) {
 		// init cube and add it to the scene
 		cube = new THREE.Mesh(
 			new THREE.CubeGeometry(50,50,50),
-			new THREE.MeshBasicMaterial({color: 0x00FF00, opacity: 1})
+			material
+			//new THREE.MeshBasicMaterial({color: 0x00FF00, opacity: 1})
 		);
 		cube.position.x = i*60;
 		cube.castShadow = true;
