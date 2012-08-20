@@ -171,6 +171,9 @@ function init() {
 					j--;
 				}
 				
+				var posX = k*50 - bounds.x/2;
+				var posY = j*50;
+				
 				if (tiles[i] >= 9) {
 					
 					switch (tiles[i]) {
@@ -193,8 +196,8 @@ function init() {
 						new THREE.CubeGeometry(50,50,50,3,3,3, materials),
 						new THREE.MeshFaceMaterial()
 					);
-					cube.position.x = k*50 - bounds.x/2;
-					cube.position.y = j*50;
+					cube.position.x = posX;
+					cube.position.y = posY;
 					cube.castShadow = true;
 					cube.receiveShadow = true;
 					
@@ -208,8 +211,8 @@ function init() {
 								snowballMat
 							);
 							
-							sphere.position.x = k*50 - bounds.x/2;
-							sphere.position.y = j*50;
+							sphere.position.x = posX;
+							sphere.position.y = posY;
 							sphere.castShadow = true;
 							sphere.receiveShadow = true;
 							
@@ -219,8 +222,8 @@ function init() {
 						
 						case 3:
 							var newStar = THREE.SceneUtils.cloneObject(starModel);
-							newStar.position.x = k*50 - bounds.x/2;
-							newStar.position.y = j*50;
+							newStar.position.x = posX;
+							newStar.position.y = posY;
 							stars.push(newStar);
 							scene.add(newStar);
 							
