@@ -7,16 +7,52 @@ var paused;
 
 var bounds = {x:0, y:0};
 
+//models
+var loader;
+var textModel;
+var starModel;
+
+var stars = [];
+
+
 window.onload = function() {
-	init();
-	
-	// start rendering
-	render(new Date().getTime());
-	onmessage = function(ev) {
-		paused = (ev.data == 'pause');
-	};
+	// MODELS
+	// text
+	loader = new THREE.ColladaLoader();
+	loadText();
 }
 
+function loadText() {
+	loader.load('data/models/level4.dae', function(collada) {
+		textModel = collada.scene;
+		textModel.scale.set(100.1, 100.1, 100.1);
+		textModel.position.x = 0;
+		textModel.position.y = 300;
+		textModel.castShadow = textModel.receiveShadow = true;
+		textModel.updateMatrix();
+		
+		loadStar();
+	});
+}
+
+function loadStar() {
+	// star
+	loader.load('data/models/star.dae', function(collada) {
+		starModel = collada.scene;
+		starModel.geometry = collada.scene.geometry;
+		starModel.material = collada.scene.material;
+		
+		starModel.scale.set(15.0, 15.0, 15.0);
+		starModel.castShadow = starModel.receiveShadow = true;
+		starModel.updateMatrix();
+		loaded = true;
+		
+		init();
+		// start rendering
+		render(new Date().getTime());
+	});
+	
+}
 
 function init() {
 	// init renderer
@@ -32,15 +68,18 @@ function init() {
 		renderer.domElement.width/renderer.domElement.height, 
 		1, 
 		10000);
-	camera.position.z = 300;
+		
+	camera.position.z = 1500;
 	
 	controls = new THREE.TrackballControls(camera);
 	
 	// init scene
 	scene = new THREE.Scene();
 	
+	// add text to scene
+	scene.add(textModel);
 	
-	// loading materials
+	// loading block materials
 	var topMat = new THREE.MeshLambertMaterial({
 		map: THREE.ImageUtils.loadTexture("data/img/top.png")
 	});
@@ -90,10 +129,20 @@ function init() {
 		upMiddleMat
 	];
 	
+	// loading snowball material
+	var snowballMat = new THREE.MeshLambertMaterial({
+		map: THREE.ImageUtils.loadTexture("data/img/snowball.png")
+	});
+	
 	// init light
 	var light = new THREE.AmbientLight(0x999999);
 	light.position.set(0, 330, 160);
 	scene.add(light);
+	
+	// Add some lights to the scene
+    var directionalLight = new THREE.DirectionalLight(0xeeeeee, 1.0);
+    directionalLight.position.set(-1, 0, 500);
+    scene.add(directionalLight);
 	
 	// enable shadows on the renderer
 	renderer.shadowMapEnabled = false;
@@ -111,6 +160,8 @@ function init() {
 			var width = file.width;
 			var height = file.height;
 			
+			bounds.x = width*50;
+			bounds.y = height*50;
 			
 			var j = height-1;
 			for (var i = 0; i < tiles.length; ++i) {
@@ -138,32 +189,49 @@ function init() {
 						break;
 					}
 					
-					cube = new THREE.Mesh(
+					var cube = new THREE.Mesh(
 						new THREE.CubeGeometry(50,50,50,3,3,3, materials),
 						new THREE.MeshFaceMaterial()
 					);
-					cube.position.x = k*50;
+					cube.position.x = k*50 - bounds.x/2;
 					cube.position.y = j*50;
 					cube.castShadow = true;
 					cube.receiveShadow = true;
 					
 					scene.add(cube);
 					
-					if (cube.position.x > bounds.x) {
-						bounds.x = cube.position.x;
+				} else {
+					switch (tiles[i]) {
+						case 1:
+							var sphere = new THREE.Mesh(
+								new THREE.SphereGeometry(25, 50, 50),
+								snowballMat
+							);
+							
+							sphere.position.x = k*50 - bounds.x/2;
+							sphere.position.y = j*50;
+							sphere.castShadow = true;
+							sphere.receiveShadow = true;
+							
+							scene.add(sphere);
+							
+						break;
+						
+						case 3:
+							var newStar = THREE.SceneUtils.cloneObject(starModel);
+							newStar.position.x = k*50 - bounds.x/2;
+							newStar.position.y = j*50;
+							stars.push(newStar);
+							scene.add(newStar);
+							
+						break;
+						
 					}
 					
-					if (cube.position.y > bounds.y) {
-						bounds.y = cube.position.y;
-					}
 				}
 				
 			}
 			
-			scene.position.x = scene.position.x+bounds.x/2;
-			camera.position.set(bounds.x/2, bounds.y, 1900);
-			camera.lookAt(scene.position.x +bounds.x/2, scene.position.y + bounds.y);
-			console.log(scene.position.x +bounds.x/2);
 		},
 		url: 'data/levels/4.json'
 	});
@@ -185,23 +253,30 @@ function update() {
 }
 
 function onWindowResize() {
-
 	camera.aspect = window.innerWidth / window.innerHeight;
 	camera.updateProjectionMatrix();
 
 	renderer.setSize(window.innerWidth, window.innerHeight);
+}
 
+function onDocumentMouseWheel( event ) {
+    fov -= event.wheelDeltaY * 0.05;
+    camera.projectionMatrix = THREE.Matrix4.makePerspective(fov, window.innerWidth / window.innerHeight, 1, 1100);
 }
 
 
 function render(t) {
-	if (!paused) {
-	  //camera.position.set(Math.sin(t/1000)*1900 + bounds.x/2, bounds.y, 900);
-	  renderer.clear();
-	  //camera.lookAt(scene.position.x +bounds.x/2, scene.position.y + bounds.y);
-	  //camera.lookAt(scene.position);
-	  renderer.render(scene, camera);
+	//camera.position.set(Math.sin(t/1000)*1900 + bounds.x/2, bounds.y, 900);
+	renderer.clear();
+	//camera.lookAt(scene.position.x +bounds.x/2, scene.position.y + bounds.y);
+	//camera.lookAt(scene.position);
+	if (starModel) {
+		for (i in stars) {
+			stars[i].rotation.y = t/900;
+		}
 	}
+		
+	renderer.render(scene, camera);
 	
 	controls.update();
 	
