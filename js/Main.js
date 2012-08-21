@@ -135,7 +135,7 @@ function init() {
 	scene.add(light);
 	
 	// add another light
-    var directionalLight = new THREE.DirectionalLight(0xeeeeee, 1.0);
+    var directionalLight = new THREE.DirectionalLight(0xeeeeee, 1.5);
     directionalLight.position.set(-1, 0, 500);
     scene.add(directionalLight);
 	
