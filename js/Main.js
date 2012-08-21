@@ -3,8 +3,6 @@ var camera;
 var scene;
 var controls;
 
-var paused;
-
 var bounds = {x:0, y:0};
 
 //models
@@ -14,10 +12,7 @@ var starModel;
 
 var stars = [];
 
-
 window.onload = function() {
-	// MODELS
-	// text
 	loader = new THREE.ColladaLoader();
 	loadText();
 }
@@ -139,7 +134,7 @@ function init() {
 	light.position.set(0, 330, 160);
 	scene.add(light);
 	
-	// Add some lights to the scene
+	// add another light
     var directionalLight = new THREE.DirectionalLight(0xeeeeee, 1.0);
     directionalLight.position.set(-1, 0, 500);
     scene.add(directionalLight);
@@ -210,12 +205,10 @@ function init() {
 								new THREE.SphereGeometry(25, 50, 50),
 								snowballMat
 							);
-							
 							sphere.position.x = posX;
 							sphere.position.y = posY;
 							sphere.castShadow = true;
 							sphere.receiveShadow = true;
-							
 							scene.add(sphere);
 							
 						break;
@@ -228,30 +221,17 @@ function init() {
 							scene.add(newStar);
 							
 						break;
-						
 					}
-					
 				}
-				
 			}
-			
 		},
 		url: 'data/levels/4.json'
 	});
-		
-	
-	
+
 	renderer.render(scene, camera);
 	paused = false;
 	
 	window.addEventListener('resize', onWindowResize, false );
-	
-}
-
-
-
-function update() {
-	
 	
 }
 
@@ -262,26 +242,24 @@ function onWindowResize() {
 	renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-function onDocumentMouseWheel( event ) {
+function onDocumentMouseWheel(event) {
     fov -= event.wheelDeltaY * 0.05;
-    camera.projectionMatrix = THREE.Matrix4.makePerspective(fov, window.innerWidth / window.innerHeight, 1, 1100);
+    camera.projectionMatrix = THREE.Matrix4.makePerspective(
+		fov, 
+		window.innerWidth / window.innerHeight, 
+		1, 
+		1100
+	);
 }
 
-
 function render(t) {
-	//camera.position.set(Math.sin(t/1000)*1900 + bounds.x/2, bounds.y, 900);
 	renderer.clear();
-	//camera.lookAt(scene.position.x +bounds.x/2, scene.position.y + bounds.y);
-	//camera.lookAt(scene.position);
 	if (starModel) {
 		for (i in stars) {
 			stars[i].rotation.y = t/900;
 		}
 	}
-		
 	renderer.render(scene, camera);
-	
 	controls.update();
-	
 	window.requestAnimFrame(render, renderer.domElement);
 };
