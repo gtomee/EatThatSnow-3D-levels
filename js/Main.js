@@ -9,8 +9,10 @@ var bounds = {x:0, y:0};
 var loader;
 var textModel;
 var starModel;
+var fireballModel;
 
 var stars = [];
+var fireballs = [];
 
 window.onload = function() {
 	loader = new THREE.ColladaLoader();
@@ -26,8 +28,26 @@ function loadText() {
 		textModel.castShadow = textModel.receiveShadow = true;
 		textModel.updateMatrix();
 		
-		loadStar();
+		loadFireball();
 	});
+}
+
+function loadFireball() {
+	// star
+	loader.load('data/models/fireball.dae', function(collada) {
+		fireballModel = collada.scene;
+		fireballModel.geometry = collada.scene.geometry;
+		fireballModel.material = collada.scene.material;
+		
+		fireballModel.scale.set(15.0, 15.0, 15.0);
+		fireballModel.castShadow = fireballModel.receiveShadow = true;
+		fireballModel.updateMatrix();
+		loaded = true;
+		
+		loadStar();
+		
+	});
+	
 }
 
 function loadStar() {
@@ -213,6 +233,15 @@ function init() {
 							
 						break;
 						
+						case 2:
+							var newFireball = THREE.SceneUtils.cloneObject(fireballModel);
+							newFireball.position.x = posX;
+							newFireball.position.y = posY;
+							fireballs.push(newFireball);
+							scene.add(newFireball);
+							
+						break;
+						
 						case 3:
 							var newStar = THREE.SceneUtils.cloneObject(starModel);
 							newStar.position.x = posX;
@@ -259,6 +288,13 @@ function render(t) {
 			stars[i].rotation.y = t/900;
 		}
 	}
+	
+	if (fireballModel) {
+		for (i in fireballs) {
+			fireballs[i].rotation.y = t/500;
+		}
+	}
+	
 	renderer.render(scene, camera);
 	controls.update();
 	window.requestAnimFrame(render, renderer.domElement);
