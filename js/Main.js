@@ -36,13 +36,9 @@ function loadFireball() {
 	// star
 	loader.load('data/models/fireball.dae', function(collada) {
 		fireballModel = collada.scene;
-		fireballModel.geometry = collada.scene.geometry;
-		fireballModel.material = collada.scene.material;
-		
 		fireballModel.scale.set(15.0, 15.0, 15.0);
-		fireballModel.castShadow = fireballModel.receiveShadow = true;
+		fireballModel.castShadow = fireballModel.receiveShadow = false;
 		fireballModel.updateMatrix();
-		loaded = true;
 		
 		loadStar();
 		
@@ -54,9 +50,6 @@ function loadStar() {
 	// star
 	loader.load('data/models/star.dae', function(collada) {
 		starModel = collada.scene;
-		starModel.geometry = collada.scene.geometry;
-		starModel.material = collada.scene.material;
-		
 		starModel.scale.set(15.0, 15.0, 15.0);
 		starModel.castShadow = starModel.receiveShadow = true;
 		starModel.updateMatrix();
@@ -291,7 +284,9 @@ function render(t) {
 	
 	if (fireballModel) {
 		for (i in fireballs) {
-			fireballs[i].rotation.y = t/500;
+			//fireballs[i].rotation.y = t/500;
+			var delta = (Math.abs(Math.cos(t/500)+5.0)*5.0);
+			fireballs[i].scale.set(delta, 15.0, delta);
 		}
 	}
 	
