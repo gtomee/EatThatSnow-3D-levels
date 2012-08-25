@@ -41,7 +41,6 @@ function loadFireball() {
 		fireballModel.updateMatrix();
 		
 		loadStar();
-		
 	});
 	
 }
@@ -132,7 +131,7 @@ function init() {
 		upMiddleMat,
 		upMiddleMat,
 		topMat,
-		bottomMat,
+		middleMat,
 		upMiddleMat,
 		upMiddleMat
 	];
@@ -284,8 +283,7 @@ function render(t) {
 	
 	if (fireballModel) {
 		for (i in fireballs) {
-			//fireballs[i].rotation.y = t/500;
-			var delta = (Math.abs(Math.cos(t/500)+5.0)*5.0);
+			var delta = (Math.abs(Math.cos(t/200)+5.0)*5.0);
 			fireballs[i].scale.set(delta, 15.0, delta);
 		}
 	}
