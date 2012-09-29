@@ -252,8 +252,8 @@ function init() {
 	});
 
 
-	// Adding Skybox (cube)
-	var SKYBOX_SIZE = 5000;
+	// Adding Skybox
+	var SKYBOX_WIDTH = 5000; var SKYBOX_HEIGHT = 3000;
 	var texture = THREE.ImageUtils.loadTexture('data/img/background.png');
 	var textureTop = THREE.ImageUtils.loadTexture('data/img/background_top.png');
 	var textureBottom = THREE.ImageUtils.loadTexture('data/img/background_bottom.png');
@@ -261,41 +261,42 @@ function init() {
 	var sky = new THREE.MeshBasicMaterial( { map: textureTop});
 	var ground = new THREE.MeshBasicMaterial( { map: textureBottom});
 	
-	var planeGeom = new THREE.PlaneGeometry(SKYBOX_SIZE, SKYBOX_SIZE);
+	var planeGeom = new THREE.PlaneGeometry(SKYBOX_WIDTH, SKYBOX_HEIGHT);
+	var planeTopBottomGeom = new THREE.PlaneGeometry(SKYBOX_WIDTH, SKYBOX_WIDTH);
 	
 	// top
-	var plane = new THREE.Mesh(planeGeom, sky);
-	plane.position.y = SKYBOX_SIZE/2;
+	var plane = new THREE.Mesh(planeTopBottomGeom, sky);
+	plane.position.y = SKYBOX_HEIGHT/2;
 	plane.rotation.x = Math.PI/2;
 	scene.add(plane);
 	
 	// bottom
-	plane = new THREE.Mesh(planeGeom, ground);
-	plane.position.y = -SKYBOX_SIZE/2;
+	plane = new THREE.Mesh(planeTopBottomGeom, ground);
+	plane.position.y = -SKYBOX_HEIGHT/2;
 	plane.rotation.x = -Math.PI/2;
 	scene.add(plane);
 	
 	// side 1
 	plane = new THREE.Mesh(planeGeom, material);
-	plane.position.x = SKYBOX_SIZE/2;
+	plane.position.x = SKYBOX_WIDTH/2;
 	plane.rotation.y = -Math.PI/2;
 	scene.add(plane);
 	
 	// side 2
 	plane = new THREE.Mesh(planeGeom, material);
-	plane.position.z = SKYBOX_SIZE/2;
+	plane.position.z = SKYBOX_WIDTH/2;
 	plane.rotation.y = Math.PI;
 	scene.add(plane);
 	
 	// side 3
 	plane = new THREE.Mesh(planeGeom, material);
-	plane.position.x = -SKYBOX_SIZE/2;
+	plane.position.x = -SKYBOX_WIDTH/2;
 	plane.rotation.y = Math.PI/2;
 	scene.add(plane);	
 	
 	// side 4
 	plane = new THREE.Mesh(planeGeom, material);
-	plane.position.z = -SKYBOX_SIZE/2;
+	plane.position.z = -SKYBOX_WIDTH/2;
 	scene.add(plane);
 	
 	renderer.render(scene, camera);
