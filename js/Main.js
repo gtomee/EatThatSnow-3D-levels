@@ -62,6 +62,10 @@ function loadStar() {
 }
 
 function init() {
+	
+	// init scene
+	scene = new THREE.Scene();
+	
 	// init renderer
 	renderer = new THREE.WebGLRenderer({antialias: true});
 	renderer.setSize(document.body.clientWidth, document.body.clientHeight);
@@ -69,19 +73,33 @@ function init() {
 	renderer.setClearColorHex(0x50CCE1FF, 1.0);
 	renderer.clear();
 	
+	// init light
+	var light = new THREE.AmbientLight(0x999999);
+	light.position.set(0, 330, 160);
+	scene.add(light);
 	
+	// add another light
+    var directionalLight = new THREE.DirectionalLight(0xeeeeee, 1.5);
+    directionalLight.position.set(-1, 0, 500);
+    scene.add(directionalLight);
+	
+	// enable shadows on the renderer
+	renderer.shadowMapEnabled = false;
+
+	// enable shadows for a light
+	light.castShadow = true;
+
 	// init camera
 	camera = new THREE.PerspectiveCamera(45, 
 		renderer.domElement.width/renderer.domElement.height, 
-		1, 
-		10000);
+		0.1, 
+		20000);
 		
 	camera.position.z = 1500;
 	
 	controls = new THREE.TrackballControls(camera);
 	
-	// init scene
-	scene = new THREE.Scene();
+	
 	
 	// add text to scene
 	scene.add(textModel);
@@ -140,22 +158,6 @@ function init() {
 	var snowballMat = new THREE.MeshLambertMaterial({
 		map: THREE.ImageUtils.loadTexture("data/img/snowball.png")
 	});
-	
-	// init light
-	var light = new THREE.AmbientLight(0x999999);
-	light.position.set(0, 330, 160);
-	scene.add(light);
-	
-	// add another light
-    var directionalLight = new THREE.DirectionalLight(0xeeeeee, 1.5);
-    directionalLight.position.set(-1, 0, 500);
-    scene.add(directionalLight);
-	
-	// enable shadows on the renderer
-	renderer.shadowMapEnabled = false;
-
-	// enable shadows for a light
-	light.castShadow = true;
 	
 	// load level
 	$.ajax({
@@ -249,8 +251,54 @@ function init() {
 		url: 'data/levels/4.json'
 	});
 
+
+	// Adding Skybox (cube)
+	var SKYBOX_SIZE = 5000;
+	var texture = THREE.ImageUtils.loadTexture('data/img/background.png');
+	var textureTop = THREE.ImageUtils.loadTexture('data/img/background_top.png');
+	var textureBottom = THREE.ImageUtils.loadTexture('data/img/background_bottom.png');
+	var material = new THREE.MeshBasicMaterial( { map: texture});
+	var sky = new THREE.MeshBasicMaterial( { map: textureTop});
+	var ground = new THREE.MeshBasicMaterial( { map: textureBottom});
+	
+	var planeGeom = new THREE.PlaneGeometry(SKYBOX_SIZE, SKYBOX_SIZE);
+	
+	// top
+	var plane = new THREE.Mesh(planeGeom, sky);
+	plane.position.y = SKYBOX_SIZE/2;
+	plane.rotation.x = Math.PI/2;
+	scene.add(plane);
+	
+	// bottom
+	plane = new THREE.Mesh(planeGeom, ground);
+	plane.position.y = -SKYBOX_SIZE/2;
+	plane.rotation.x = -Math.PI/2;
+	scene.add(plane);
+	
+	// side 1
+	plane = new THREE.Mesh(planeGeom, material);
+	plane.position.x = SKYBOX_SIZE/2;
+	plane.rotation.y = -Math.PI/2;
+	scene.add(plane);
+	
+	// side 2
+	plane = new THREE.Mesh(planeGeom, material);
+	plane.position.z = SKYBOX_SIZE/2;
+	plane.rotation.y = Math.PI;
+	scene.add(plane);
+	
+	// side 3
+	plane = new THREE.Mesh(planeGeom, material);
+	plane.position.x = -SKYBOX_SIZE/2;
+	plane.rotation.y = Math.PI/2;
+	scene.add(plane);	
+	
+	// side 4
+	plane = new THREE.Mesh(planeGeom, material);
+	plane.position.z = -SKYBOX_SIZE/2;
+	scene.add(plane);
+	
 	renderer.render(scene, camera);
-	paused = false;
 	
 	window.addEventListener('resize', onWindowResize, false );
 	
