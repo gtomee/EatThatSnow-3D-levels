@@ -1,20 +1,13 @@
 # Eat That Snow 3D Levels
 
 ## Description
-This is a simple lab displaying 3D levels from Eat That Snow game.
+This is a simple lab displaying a level from Eat That Snow, in 3D.
 
-It uses Three.js and therefore requires a WebGL compatible browser (latest Firefox and Chrome are ok). 
+It uses Three.js and therefore requires a WebGL compatible browser (latest Firefox and Chrome are ok).
 
-Here is the [demo](http://labs.gtomee.com/ets-3D-levels/).
-
-For the moment, the demo only displays the level 4, but you can discover the other levels through the original game :)
+This demo only displays the level 4, but you can discover the other levels through the original game :)
 
 ## About Eat That Snow
 Eat That Snow is a very funny game, playable both on Android and in the browser:
 * [Eat That Snow Android](https://play.google.com/store/apps/details?id=com.gtomee.eatthatsnow)
 * [Eat That Snow HTML5](https://eatthatsnow.gtomee.com) (WebGL)
-
-## Screenshot
-Here is a screenshot from the demo :
-
-![Eat That Snow 3D Levels](http://gtomee.com/wp-content/uploads/2012/09/eat_that_snow_3D_levels_2-e1348998747948.png "Eat That Snow 3D Levels")
